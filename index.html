@@ -8,43 +8,120 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { margin: 0; font-family: sans-serif; }
-    </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // Mock Lucide Icons (Vì không thể import trực tiếp trong browser)
-        const { CheckCircle, Circle, Book, Calendar, Target, Award, Menu, X } = {
-            CheckCircle: () => <span>✅</span>,
-            Circle: () => <span>⚪</span>,
-            Book: () => <span>📖</span>,
-            Calendar: () => <span>📅</span>,
-            Target: () => <span>🎯</span>,
-            Award: () => <span>🏆</span>,
-            Menu: () => <span>☰</span>,
-            X: () => <span>✕</span>
-        };
-
         const { useState, useEffect } = React;
 
-        const IELTSStudyTracker = () => {
-            // Copy toàn bộ phần logic từ file .jsx của bạn vào đây
-            // (Lưu ý: Bỏ dòng 'import' và 'export default' ở đầu và cuối)
-            const [currentView, setCurrentView] = useState('dashboard');
-            const [currentWeek, setCurrentWeek] = useState(1);
-            const [completedTasks, setCompletedTasks] = useState({});
-            
-            // ... (Phần code còn lại của bạn) ...
+        // Mock Icons (Thay thế lucide-react để chạy trực tiếp trên browser)
+        const CheckCircle = () => <span style={{marginRight: '8px'}}>✅</span>;
+        const Circle = () => <span style={{marginRight: '8px'}}>⚪</span>;
+        const Book = ({size}) => <span>📚</span>;
+        const Calendar = () => <span>📅</span>;
+        const Target = () => <span>🎯</span>;
+        const Award = () => <span>🏆</span>;
+        const Menu = () => <span>☰</span>;
+        const X = () => <span>✕</span>;
 
+        const IELTSStudyTracker = () => {
+          const [currentView, setCurrentView] = useState('dashboard');
+          const [currentWeek, setCurrentWeek] = useState(1);
+          const [completedTasks, setCompletedTasks] = useState({});
+          const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+          const [loading, setLoading] = useState(false);
+
+          const toggleTask = (taskId) => {
+            const newCompletedTasks = { ...completedTasks, [taskId]: !completedTasks[taskId] };
+            setCompletedTasks(newCompletedTasks);
+            localStorage.setItem('completed-tasks', JSON.stringify(newCompletedTasks));
+          };
+
+          const changeWeek = (newWeek) => {
+            setCurrentWeek(newWeek);
+            localStorage.setItem('current-week', newWeek);
+          };
+
+          const lightDaySchedule = [
+            { time: '30 Min', activity: 'Active Listening', task: 'Podcast: The Economist, HBR IdeaCast, or IELTS Energy.' },
+            { time: '45 Min', activity: 'Focused Skill', task: 'Tue/Thu: Reading. Wed/Fri: Listening.' },
+            { time: '15 Min', activity: 'Vocab Review', task: 'Review flashcards relating to Dublin/Marketing.' },
+            { time: '30 Min', activity: 'Speaking (Shadowing)', task: 'Shadow a Band 9 video. Record yourself.' }
+          ];
+
+          const heavyDaySchedule = [
+            { time: '60 Min', activity: 'Writing Task 2', task: '15 min plan (PEEL method) + 40 min write.' },
+            { time: '60 Min', activity: 'Full Practice Test', task: 'Sat: Reading. Sun: Listening. Mon: Writing Task 1.' },
+            { time: '60 Min', activity: 'Review & Analysis', task: 'Analyze mistakes. Why wrong? Vocab? Logic?' },
+            { time: '45 Min', activity: 'Speaking Part 2 & 3', task: 'Record Cue Card. Re-record until perfect.' }
+          ];
+
+          const roadmap = [
+            { month: 'Month 1 (Jan)', title: 'Foundation & Accuracy', goal: 'Stop making "silly" mistakes', focus: 'Review Articles and Subject-Verb Agreement' },
+            { month: 'Month 2 (Feb)', title: 'Lexical Resource & Structure', goal: 'Inject "Less Common" vocabulary', focus: 'Master cohesion and signposting.' },
+            { month: 'Month 3 (Mar)', title: 'Speed & Critical Thinking', goal: 'Speed up Reading/Writing', focus: 'Practice skimming vs scanning.' },
+            { month: 'Month 4 (Apr)', title: 'Exam Mode', goal: 'Build stamina', focus: 'Full 2hr 40min tests every Sunday.' }
+          ];
+
+          const getCurrentMonthInfo = () => roadmap[Math.min(Math.floor((currentWeek - 1) / 4), 3)];
+          
+          const DashboardView = () => {
+            const monthInfo = getCurrentMonthInfo();
             return (
-                <div className="p-10 text-center">
-                    <h1 className="text-2xl font-bold">IELTS 6.0 → 7.0 Tracker</h1>
-                    <p>Hệ thống đang sẵn sàng! Hãy thay nội dung này bằng code giao diện của bạn.</p>
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-6 text-left">
+                  <h2 className="text-2xl font-bold mb-2">Week {currentWeek} of 16</h2>
+                  <p>{monthInfo.month}: {monthInfo.title}</p>
                 </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 text-left">
+                    <h3 className="text-lg font-semibold flex items-center"><Calendar /> Light Days</h3>
+                    <button onClick={() => setCurrentView('light-days')} className="mt-3 text-green-600 font-medium">View Schedule →</button>
+                  </div>
+                  <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500 text-left">
+                    <h3 className="text-lg font-semibold flex items-center"><Target /> Heavy Days</h3>
+                    <button onClick={() => setCurrentView('heavy-days')} className="mt-3 text-orange-600 font-medium">View Schedule →</button>
+                  </div>
+                </div>
+              </div>
             );
+          };
+
+          const ListView = ({title, schedule, type, color}) => (
+            <div className="space-y-4 text-left">
+              <h3 className={`text-xl font-bold text-${color}-600`}>{title}</h3>
+              {schedule.map((item, index) => (
+                <div key={index} className="bg-white p-4 rounded-lg shadow flex items-start gap-3">
+                  <button onClick={() => toggleTask(`week${currentWeek}-${type}-${index}`)}>
+                    {completedTasks[`week${currentWeek}-${type}-${index}`] ? <CheckCircle /> : <Circle />}
+                  </button>
+                  <div>
+                    <span className={`text-xs font-bold bg-${color}-100 p-1 rounded`}>{item.time}</span>
+                    <h4 className="font-bold">{item.activity}</h4>
+                    <p className="text-sm text-gray-600">{item.task}</p>
+                  </div>
+                </div>
+              ))}
+              <button onClick={() => setCurrentView('dashboard')} className="text-blue-500 underline">Back to Dashboard</button>
+            </div>
+          );
+
+          return (
+            <div className="min-h-screen bg-gray-50 pb-10">
+              <header className="bg-white shadow-sm p-4 mb-6 flex justify-between items-center">
+                <h1 className="text-xl font-bold flex items-center gap-2"><Book /> IELTS 6.0 → 7.0</h1>
+                <select value={currentWeek} onChange={(e) => changeWeek(e.target.value)} className="border p-1 rounded">
+                  {[...Array(16)].map((_, i) => <option key={i+1} value={i+1}>Week {i+1}</option>)}
+                </select>
+              </header>
+              <main className="max-w-4xl mx-auto px-4">
+                {currentView === 'dashboard' && <DashboardView />}
+                {currentView === 'light-days' && <ListView title="Light Days (Tue-Fri)" schedule={lightDaySchedule} type="light" color="green" />}
+                {currentView === 'heavy-days' && <ListView title="Heavy Days (Sat-Mon)" schedule={heavyDaySchedule} type="heavy" color="orange" />}
+              </main>
+            </div>
+          );
         };
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
