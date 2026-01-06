@@ -9,21 +9,44 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-                sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+        body { margin: 0; font-family: sans-serif; }
     </style>
 </head>
 <body>
     <div id="root"></div>
-    
-    <script type="text/babel" src="./ielts-study-tracker.jsx"></script>
+
     <script type="text/babel">
+        // Mock Lucide Icons (Vì không thể import trực tiếp trong browser)
+        const { CheckCircle, Circle, Book, Calendar, Target, Award, Menu, X } = {
+            CheckCircle: () => <span>✅</span>,
+            Circle: () => <span>⚪</span>,
+            Book: () => <span>📖</span>,
+            Calendar: () => <span>📅</span>,
+            Target: () => <span>🎯</span>,
+            Award: () => <span>🏆</span>,
+            Menu: () => <span>☰</span>,
+            X: () => <span>✕</span>
+        };
+
+        const { useState, useEffect } = React;
+
+        const IELTSStudyTracker = () => {
+            // Copy toàn bộ phần logic từ file .jsx của bạn vào đây
+            // (Lưu ý: Bỏ dòng 'import' và 'export default' ở đầu và cuối)
+            const [currentView, setCurrentView] = useState('dashboard');
+            const [currentWeek, setCurrentWeek] = useState(1);
+            const [completedTasks, setCompletedTasks] = useState({});
+            
+            // ... (Phần code còn lại của bạn) ...
+
+            return (
+                <div className="p-10 text-center">
+                    <h1 className="text-2xl font-bold">IELTS 6.0 → 7.0 Tracker</h1>
+                    <p>Hệ thống đang sẵn sàng! Hãy thay nội dung này bằng code giao diện của bạn.</p>
+                </div>
+            );
+        };
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<IELTSStudyTracker />);
     </script>
